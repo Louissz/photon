@@ -1,6 +1,7 @@
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviourPunCallbacks
 {
@@ -24,7 +25,21 @@ public class GameManager : MonoBehaviourPunCallbacks
     {
         PhotonNetwork.ConnectUsingSettings();
         PhotonNetwork.GameVersion = gameVersion;
+        SceneManager.sceneLoaded += OnSceneLoaded;
+
     }
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (!PhotonNetwork.InRoom)
+
+        {
+            return;
+        }
+        localPlayer = PhotonNetwork.Instantiate("TankPlayer", new Vector3(0, 0, 0), Quaternion.identity, 0);
+        Debug.Log("Player Instance ID: " + localPlayer.GetInstanceID());
+    }
+
+
     public override void OnConnected()
     {
         Debug.Log("PUN Connected");
@@ -60,6 +75,15 @@ public class GameManager : MonoBehaviourPunCallbacks
             Debug.Log("Joined room!!");
         }
     }
+
+
+    public override void OnJoinRoomFailed(short returnCode, string message)
+    {
+        Debug.LogError($"Join GameRoom Failed Message : {message}");
+    }
+
+
+    public static GameObject localPlayer;
 
 
 }
