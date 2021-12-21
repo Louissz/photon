@@ -91,7 +91,7 @@ namespace Complete
             // Create an instance of the shell and store a reference to it's rigidbody.
             Rigidbody shellInstance =
                 Instantiate(m_Shell, m_FireTransform.position, m_FireTransform.rotation) as Rigidbody;
-            photonView.RPC("FireOther", RpcTarget.Others, m_FireTransform.position);
+            photonView.RPC("FireOther", RpcTarget.Others, m_FireTransform.position, shellInstance.velocity);
 
 
             // Set the shell's velocity to the launch force in the fire position's forward direction.
@@ -112,6 +112,7 @@ namespace Complete
             Rigidbody shellInstance = Instantiate(m_Shell, pos, m_FireTransform.rotation) as Rigidbody;
             shellInstance.velocity = m_CurrentLaunchForce * m_FireTransform.forward;
             m_CurrentLaunchForce = m_MinLaunchForce;
+            photonView.RPC("FireOther", RpcTarget.Others, m_FireTransform.position, shellInstance.velocity);
         }
 
     }

@@ -19,10 +19,14 @@ namespace Complete
         private float m_TurnInputValue;             // The current value of the turn input.
         private float m_OriginalPitch;              // The pitch of the audio source at the start of the scene.
         private ParticleSystem[] m_particleSystems; // References to all the particles systems used by the Tanks
+        private string mTurnturretName;
+        private float mTurnturretValue;
+        private Transform mTurret;
 
         private void Awake ()
         {
             m_Rigidbody = GetComponent<Rigidbody> ();
+            Transform.FindAnyChild<TurnTurret>
         }
 
 
@@ -64,6 +68,7 @@ namespace Complete
             // The axes names are based on player number.
             m_MovementAxisName = "Vertical";
             m_TurnAxisName = "Horizontal" ;
+            mTurnturretName = "TurnTurret";
 
             // Store the original pitch of the audio source.
             m_OriginalPitch = m_MovementAudio.pitch;
@@ -113,6 +118,7 @@ namespace Complete
             // Adjust the rigidbodies position and orientation in FixedUpdate.
             Move ();
             Turn ();
+            TurnTurret();
         }
 
 
@@ -137,5 +143,19 @@ namespace Complete
             // Apply this rotation to the rigidbody's rotation.
             m_Rigidbody.MoveRotation (m_Rigidbody.rotation * turnRotation);
         }
+
+        private void TurnTurret()
+        {
+            float turn = mTurnturretValue * m_TurnSpeed * Time.deltaTime;
+            Quaternion turnRotation = Quaternion.Euler(0f, turn, 0f);
+            m_Rigidbody.MoveRotation(m_Rigidbody.rotation * turnRotation);
+            photonView.RPC("FireOther", RpcTarget.Others, mTurret.position);
+
+        }
+
+        [PunRPC]
+        private void FireOther(Vector3 pos)
+        {
+            m_Fired = true;
+        }
     }
-}
